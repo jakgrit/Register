@@ -1,23 +1,13 @@
 
 import javax.swing.JOptionPane;
+import org.json.JSONObject;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author FRAME
- */
 public class Register extends javax.swing.JFrame {
 
     private String id = "", name = "", pass = "", confirmpass = "", email = "", surname = "";
 
     public Register() {
         initComponents();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -135,39 +125,40 @@ public class Register extends javax.swing.JFrame {
         this.email = g_mail.getText();
         this.surname = g_sur.getText();
 
-        if(!pass.equals(confirmpass)){
+        if (!pass.equals(confirmpass)) {
             JOptionPane.showMessageDialog(null, "รหัสผ่านไม่ตรงกัน");
         }
-        
+
         if (g_id.getText().equals("") || g_name.getText().equals("") || g_pass.getText().equals("") || g_conpass.getText().equals("") || g_mail.getText().equals("") || g_sur.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "กรุณากรอกข้อมูลให้ครบ");
         } else {
             try {
 
-                Regis.sendToServer(id, pass, name, surname, email);
+                JSONObject json = Regis.sendToServer(id, pass, name, surname, email);
+
+                if (json.getInt("status") == 0) {
+                    JOptionPane.showMessageDialog(null, "Success!!");
+                } else {
+                    JOptionPane.showMessageDialog(null, json.getString("message"));
+                    if (json.getString("message").equals("Username is already in use")) {
+                        g_id.setText("");
+
+                        g_pass.setText("");
+                        g_conpass.setText("");
+                    } else if (json.getString("message").equals("E-Mail is already in use")) {
+                        g_mail.setText("");
+                    }
+                }
 
             } catch (Exception ex) {
 
             }
         }
-
-        g_id.setText("");
-        g_name.setText("");
-        g_pass.setText("");
-        g_conpass.setText("");
-        g_mail.setText("");
-        g_sur.setText("");
-
-
+        setText();
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        g_id.setText("");
-        g_name.setText("");
-        g_pass.setText("");
-        g_conpass.setText("");
-        g_mail.setText("");
-        g_sur.setText("");
+        setText();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -203,6 +194,15 @@ public class Register extends javax.swing.JFrame {
                 new Register().setVisible(true);
             }
         });
+    }
+
+    private void setText() {
+        g_id.setText("");
+        g_name.setText("");
+        g_pass.setText("");
+        g_conpass.setText("");
+        g_mail.setText("");
+        g_sur.setText("");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
